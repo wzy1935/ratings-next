@@ -1,9 +1,7 @@
 import React from "react";
 
 
-export default function Home({children}: {
-  children: React.ReactNode
-}) {
+export default function Home() {
   return (
     <>
     hello
