@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,35 +8,33 @@ datasource db {
 }
 
 model Likes {
-  id Int @id @default(autoincrement())
+  id       Int    @id @default(autoincrement())
   ratingId Int
-  userId String
+  userId   String
 }
 
 model Rating {
-  id Int @id @default(autoincrement())
-  score Int
-  likes Int
-  comments String
-
-  board Board @relation(fields: [boardId], references: [id])
-  boardId Int
+  id        Int      @id @default(autoincrement())
+  score     Int
+  likes     Int
+  comments  String
+  boardId   Int
   createdBy String
   createdAt DateTime
+  board     Board    @relation(fields: [boardId], references: [id])
 }
 
 model Board {
-  id Int @id @default(autoincrement())
-  imageUrl String?
-  name String
+  id          Int      @id @default(autoincrement())
+  imageId    String?
+  createdBy   String
+  createdAt   DateTime
   description String
-
-  createdBy String
-  createdAt DateTime
-  ratings Rating[]
+  name        String
+  ratings     Rating[]
 }
 
 model Admin {
-  id Int @id @default(autoincrement())
+  id     Int    @id @default(autoincrement())
   userId String @unique
 }

@@ -1,8 +1,10 @@
 import type { Metadata } from 'next';
 import '@mantine/core/styles.css';
 import './globals.css';
+import '@mantine/notifications/styles.css';
 import { createTheme, MantineProvider } from '@mantine/core';
 import { ClerkProvider } from '@clerk/nextjs';
+import { Notifications } from '@mantine/notifications';
 
 import Header from './_components/Header';
 import Footer from './_components/Footer';
@@ -26,6 +28,7 @@ export default function RootLayout({
       <html lang="en">
         <body>
           <MantineProvider theme={theme}>
+            <Notifications />
             <div className=" h-screen">
               <div className=" h-full flex flex-col">
                 <Header></Header>
