@@ -42,7 +42,6 @@ export default async function createBoard(
       name: form.title,
     },
   });
-  console.log(existed);
   if (existed) return 'CONFICT_NAME';
 
   let imageId: string | null = null;

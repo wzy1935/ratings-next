@@ -2,7 +2,20 @@ import { Title } from '@mantine/core';
 import Segment from './_components/Segment';
 import Pagination from './_components/Pagination';
 import AddBoard from './_components/AddBoard';
+import BoardItem from './_components/BoardItem';
 import { auth } from '@clerk/nextjs';
+import { prismaClient } from '@/utils/storage';
+
+type BoardType = {
+  id: number;
+  imageId: string | null;
+  createdBy: string;
+  createdAt: Date;
+  description: string;
+  name: string;
+};
+
+const PER_PAGE = 12;
 
 export default async function Board({
   searchParams,
@@ -16,8 +29,28 @@ export default async function Board({
   const { userId } = auth();
 
   const page = searchParams.page ?? 1;
-  const type = searchParams.type ?? 'public';
-  const query = searchParams.query ?? '';
+  const type: 'user' | 'public' =
+    searchParams.type === 'user' && userId !== null ? 'user' : 'public';
+  // TODO: add query function
+
+  let boardList: BoardType[];
+  let boardCnt: number;
+  if (type === 'user' && userId !== null) {
+    boardCnt = await prismaClient.board.count({ where: { createdBy: userId } });
+    boardList = await prismaClient.board.findMany({
+      where: { createdBy: userId },
+      skip: (page - 1) * PER_PAGE,
+      take: PER_PAGE,
+    });
+  } else {
+    boardCnt = await prismaClient.board.count();
+    boardList = await prismaClient.board.findMany({
+      skip: (page - 1) * PER_PAGE,
+      take: PER_PAGE,
+    });
+  }
+
+  const pageCnt = Math.max(1, Math.ceil(boardCnt / PER_PAGE));
 
   return (
     <>
@@ -30,10 +63,14 @@ export default async function Board({
           </div>
         </div>
 
-        <div className=" grid lg:grid-cols-4 md:grid-cols-3 grid-cols-2 gap-x-4 gap-y-4"></div>
+        <div className=" grid lg:grid-cols-4 md:grid-cols-3 grid-cols-2 gap-x-4 gap-y-4">
+          {boardList.map((item) => (
+            <BoardItem key={item.id} board={item} />
+          ))}
+        </div>
 
         <div className=" flex justify-center">
-          <Pagination value={1} total={10}></Pagination>
+          <Pagination value={1} total={pageCnt}></Pagination>
         </div>
       </div>
     </>

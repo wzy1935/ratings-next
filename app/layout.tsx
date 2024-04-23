@@ -32,7 +32,7 @@ export default function RootLayout({
             <div className=" h-screen">
               <div className=" h-full flex flex-col">
                 <Header></Header>
-                <main className=" h-full p-4 md:px-20">{children}</main>
+                <main className=" h-full p-4 md:px-20 overflow-y-scroll">{children}</main>
                 <Footer></Footer>
               </div>
             </div>

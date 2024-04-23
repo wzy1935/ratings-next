@@ -15,6 +15,7 @@ import { z } from 'zod';
 import { zodResolver } from 'mantine-form-zod-resolver';
 import createBoard from '@/actions/boards/createBoard';
 import n from '@/utils/notification';
+import { useRouter } from 'next/navigation';
 
 function toBase64(file: File | null) {
   return new Promise<string | null>((resolve, reject) => {
@@ -36,6 +37,7 @@ type FormType = {
 };
 
 export default function AddBoard() {
+  const router = useRouter();
   const [opened, { open, close }] = useDisclosure(false);
   const [fileURL, setFileURL] = useState<string | null>();
   const [loading, setLoading] = useState(false);
@@ -87,6 +89,7 @@ export default function AddBoard() {
     if (returnCode === 'SUCCESS') {
       resetAndClose();
       n.success('Added board successfully.');
+      router.refresh();
     } else {
       n.error(
         {
