@@ -1,16 +1,15 @@
 'use client';
 
-import { Card, BackgroundImage, Badge, Text } from '@mantine/core';
+import {
+  Card,
+  BackgroundImage,
+  Badge,
+  Text,
+  NumberFormatter,
+} from '@mantine/core';
+import { BoardDesc } from '@/actions/boards/getBoardDesc';
 
-type BoardType = {
-  id: number;
-  imageId: string | null;
-  createdBy: string;
-  createdAt: Date;
-  description: string;
-  name: string;
-};
-function BoardItem({ board }: { board: BoardType }) {
+function BoardItem({ board }: { board: BoardDesc }) {
   return (
     <Card shadow="sm" radius="md" padding="xs" withBorder className=" h-32 p-2">
       <Card.Section className=" h-20">
@@ -22,7 +21,9 @@ function BoardItem({ board }: { board: BoardType }) {
           }
         >
           <div className=" h-full w-full justify-start items-end flex p-2">
-            <Badge>7.2</Badge>
+            <Badge>
+              <NumberFormatter value={board.overall} prefix='★ ' decimalScale={1} fixedDecimalScale/>
+            </Badge>
           </div>
         </BackgroundImage>
       </Card.Section>
