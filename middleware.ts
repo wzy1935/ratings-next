@@ -10,7 +10,7 @@ export default authMiddleware({
     }
     return NextResponse.redirect(new URL('/sign-in', req.url))
   },
-  publicRoutes: ['/', '/sign-in', '/sign-up', '/board']
+  publicRoutes: ['/', '/sign-in', '/sign-up', '/board', '/board\/([0-9]+)']
 });
 
 export const config = {

@@ -13,7 +13,7 @@ import { useState } from 'react';
 import { useForm } from '@mantine/form';
 import { z } from 'zod';
 import { zodResolver } from 'mantine-form-zod-resolver';
-import createBoard from '@/actions/createBoard';
+import editBoard from '@/actions/editBoard';
 import n from '@/utils/notification';
 import { useRouter } from 'next/navigation';
 
@@ -30,23 +30,32 @@ function toBase64(file: File | null) {
   });
 }
 
-type FormType = {
+export type FormType = {
   title: string;
   description: string;
   image: File | null;
 };
 
-export default function AddBoard() {
+export default function EditBoard({
+  initForm,
+  imageId,
+  boardId,
+}: {
+  initForm: FormType;
+  imageId: string | null;
+  boardId: number;
+}) {
   const router = useRouter();
   const [opened, { open, close }] = useDisclosure(false);
-  const [fileURL, setFileURL] = useState<string | null>();
+  const [fileURL, setFileURL] = useState<string | null>(
+    imageId
+      ? 'https://storage.googleapis.com/wzy1935-ratings/images/' + imageId
+      : null
+  );
+  const [imageChanged, setImageChanged] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const initialValues: FormType = {
-    title: '',
-    description: '',
-    image: null,
-  };
+  const initialValues: FormType = initForm;
   const schema = z.object({
     title: z
       .string()
@@ -73,6 +82,7 @@ export default function AddBoard() {
 
   function setPic(file: File | null) {
     form.setValues({ image: file });
+    setImageChanged(true);
     if (file === null) {
       setFileURL(null);
     } else {
@@ -82,13 +92,17 @@ export default function AddBoard() {
 
   async function handleSubmit(formData: FormType) {
     setLoading(true);
-    const returnCode = await createBoard({
-      ...formData,
-      image: await toBase64(formData.image),
-    });
+    const returnCode = await editBoard(
+      {
+        ...formData,
+        image: await toBase64(formData.image),
+      },
+      boardId,
+      imageChanged
+    );
     if (returnCode === 'SUCCESS') {
       resetAndClose();
-      n.success('Added board successfully.');
+      n.success('Updated board successfully.');
       router.refresh();
     } else {
       n.error(
@@ -104,17 +118,23 @@ export default function AddBoard() {
 
   function resetAndClose() {
     form.reset();
-    setFileURL(null);
+    setFileURL(
+      imageId
+        ? 'https://storage.googleapis.com/wzy1935-ratings/images/' + imageId
+        : null
+    );
     close();
   }
 
   return (
     <>
-      <Button onClick={open}>Create</Button>
+      <Button onClick={open} variant="subtle">
+        Edit
+      </Button>
       <Modal
         opened={opened}
         onClose={resetAndClose}
-        title={'Add Board'}
+        title={'Edit Board'}
         centered
       >
         <form onSubmit={form.onSubmit(handleSubmit)}>
@@ -147,7 +167,7 @@ export default function AddBoard() {
 
             <div className=" flex gap-x-2">
               <Button type="submit" loading={loading}>
-                Create
+                Edit
               </Button>
               <Button color="red" onClick={resetAndClose}>
                 Cancel

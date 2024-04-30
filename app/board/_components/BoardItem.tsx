@@ -7,7 +7,8 @@ import {
   Text,
   NumberFormatter,
 } from '@mantine/core';
-import { BoardDesc } from '@/actions/boards/getBoardDesc';
+import { User as UserIcon } from 'react-feather';
+import { BoardDesc } from '@/actions/getBoardDesc';
 
 function BoardItem({ board }: { board: BoardDesc }) {
   return (
@@ -20,16 +21,24 @@ function BoardItem({ board }: { board: BoardDesc }) {
             board.imageId
           }
         >
-          <div className=" h-full w-full justify-start items-end flex p-2">
+          <div className={" h-full w-full justify-start items-end flex p-2 " + `${board.imageId ? ' ' : ' bg-gray-200'}`}>
             <Badge>
-              <NumberFormatter value={board.overall} prefix='★ ' decimalScale={1} fixedDecimalScale/>
+              <NumberFormatter
+                value={board.overall}
+                prefix="★ "
+                decimalScale={1}
+                fixedDecimalScale
+              />
             </Badge>
           </div>
         </BackgroundImage>
       </Card.Section>
       <div>
-        <Text fw={700}>{board.name}</Text>
-        {/* <Text>{board.description}</Text> */}
+        <Text>{board.name}</Text>
+        <div className=' flex items-center gap-x-1 text-gray-500'>
+          <UserIcon size={12} />
+          <Text size="xs">{board.createdBy.username}</Text>
+        </div>
       </div>
     </Card>
   );

@@ -5,7 +5,7 @@ import AddBoard from './_components/AddBoard';
 import BoardItem from './_components/BoardItem';
 import { auth } from '@clerk/nextjs';
 import { prismaClient } from '@/utils/storage';
-import getBoardDesc, { BoardDesc } from '@/actions/boards/getBoardDesc';
+import getBoardDesc, { BoardDesc } from '@/actions/getBoardDesc';
 import Link from 'next/link';
 
 const PER_PAGE = 24;
@@ -14,14 +14,14 @@ export default async function Board({
   searchParams,
 }: {
   searchParams: {
-    page?: number;
+    page?: string;
     type?: string;
     query?: string;
   };
 }) {
   const { userId } = auth();
 
-  const page = searchParams.page ?? 1;
+  const page = searchParams.page ? Number.parseInt(searchParams.page) : 1;
   const type: 'user' | 'public' =
     searchParams.type === 'user' && userId !== null ? 'user' : 'public';
   // TODO: add query function
@@ -72,7 +72,7 @@ export default async function Board({
         </div>
 
         <div className=" flex justify-center">
-          <Pagination value={1} total={pageCnt}></Pagination>
+          <Pagination value={page} total={pageCnt}></Pagination>
         </div>
       </div>
     </>

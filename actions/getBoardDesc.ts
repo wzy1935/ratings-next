@@ -14,6 +14,7 @@ export type BoardDesc = {
   createdBy: {
     userId: string;
     username: string | null;
+    avatarUrl: string;
   };
   createAt: Date;
 };
@@ -60,6 +61,7 @@ export default async function getBoardDesc(
     createdBy: {
       userId: user.id,
       username: user.username,
+      avatarUrl: user.imageUrl,
     },
     createAt: board.createdAt,
   };
