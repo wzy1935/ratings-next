@@ -27,7 +27,6 @@ export default async function setRating(
     await prismaClient.rating.create({
       data: {
         score: score,
-        likes: 0,
         comments: content,
         boardId: boardId,
         createdBy: userId,

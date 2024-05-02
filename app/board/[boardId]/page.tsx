@@ -31,6 +31,11 @@ async function getUserRating(
           ratingId: query.id,
         },
       });
+  const likesQuery = await prismaClient.likes.count({
+    where: {
+      ratingId: query.id,
+    },
+  });
 
   return {
     id: query.id,
@@ -41,7 +46,7 @@ async function getUserRating(
     },
     content: query.comments,
     score: query.score,
-    likes: query.likes,
+    likes: likesQuery,
     liked: likedQuery !== null,
   };
 }
@@ -66,6 +71,8 @@ export default async function BoardItemPage({
   const ratings = await getRatings(boardId, PER_PAGE * (page - 1), PER_PAGE);
   const userRating =
     userId === null ? null : await getUserRating(userId, boardId);
+  const ratingCnt = await prismaClient.rating.count({where: {boardId: boardId}});
+  const pageCnt = Math.max(1, Math.ceil(ratingCnt / PER_PAGE));
 
   return (
     <div>
@@ -88,7 +95,7 @@ export default async function BoardItemPage({
         </div>
 
         <div className=" flex justify-center">
-          <PaginationComponent total={2} value={page}></PaginationComponent>
+          <PaginationComponent total={pageCnt} value={page}></PaginationComponent>
         </div>
       </div>
     </div>

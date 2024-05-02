@@ -41,6 +41,11 @@ export default async function getRatings(
               ratingId: item.id,
             },
           });
+      const likesQuery = await prismaClient.likes.count({
+        where: {
+          ratingId: item.id
+        }
+      });
 
       return {
         id: item.id,
@@ -51,7 +56,7 @@ export default async function getRatings(
         },
         content: item.comments,
         score: item.score,
-        likes: item.likes,
+        likes: likesQuery,
         liked: likedQuery !== null,
       };
     })

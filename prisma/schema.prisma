@@ -9,6 +9,7 @@ datasource db {
 
 model Likes {
   id       Int    @id @default(autoincrement())
+  rating Rating @relation(fields: [ratingId], references: [id], onDelete: Cascade)
   ratingId Int
   userId   String
 }
@@ -16,12 +17,12 @@ model Likes {
 model Rating {
   id        Int      @id @default(autoincrement())
   score     Int
-  likes     Int
   comments  String
   boardId   Int
   createdBy String
   createdAt DateTime
-  board     Board    @relation(fields: [boardId], references: [id])
+  board     Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  likes Likes[]
 }
 
 model Board {

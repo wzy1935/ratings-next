@@ -4,6 +4,7 @@ import {
   Textarea,
   Button,
   Text,
+  Modal,
   Rating as RatingComponent,
 } from '@mantine/core';
 import { Rating } from '@/actions/getRatings';
@@ -15,6 +16,8 @@ import { useForm } from '@mantine/form';
 import { zodResolver } from 'mantine-form-zod-resolver';
 import n from '@/utils/notification';
 import { useRouter } from 'next/navigation';
+import { useDisclosure } from '@mantine/hooks';
+import deleteRating from '@/actions/deleteRating';
 
 export default function UserRating({
   rating,
@@ -25,6 +28,9 @@ export default function UserRating({
 }) {
   const [edit, setEdit] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [deleteLoading, setdeleteLoading] = useState(false);
+  const [deleteOpened, { open: deleteOpen, close: deleteClose }] =
+    useDisclosure(false);
   const router = useRouter();
 
   const schema = z.object({
@@ -61,11 +67,31 @@ export default function UserRating({
     setEdit(false);
   }
 
+  async function handleDelete() {
+    if (rating === null) return;
+
+    setdeleteLoading(true);
+    const resp = await deleteRating(rating.id);
+    if (resp === 'SUCCESS') {
+      n.success('Delete rating successfully.');
+      deleteClose();
+      router.refresh();
+    } else {
+      n.error('Unknown error.');
+    }
+    setdeleteLoading(false);
+  }
+
   let display;
   if (rating === null) {
     display = <Text>You haven&apos;t rated it yet</Text>;
   } else {
-    display = <RatingItem rating={rating} />;
+    display = (
+      <div>
+        <RatingComponent value={rating.score} readOnly />
+        <Text>{rating.content}</Text>
+      </div>
+    );
   }
   return (
     <div className=" flex flex-col gap-y-2">
@@ -83,7 +109,7 @@ export default function UserRating({
             />
             <Textarea {...formPropWithoutKey('content')}></Textarea>
           </div>
-          <div className=" flex space-x-2">
+          <div className=" flex space-x-2  mt-2">
             <Button type="submit" loading={loading}>
               Submit
             </Button>
@@ -93,10 +119,31 @@ export default function UserRating({
       ) : (
         <>
           {display}
-          <div className=" flex space-x-2">
+          <div className=" flex space-x-2 mt-2">
             <Button onClick={() => setEdit(true)}>
               {rating ? 'Update' : 'Rate'}
             </Button>
+            {rating && <Button color="red" onClick={deleteOpen}>
+              Delete
+            </Button>}
+            <Modal
+              opened={deleteOpened}
+              onClose={deleteClose}
+              centered
+              title="Delete Rating"
+            >
+              <div className=" flex flex-col gap-y-2">
+                <Text>Are you sure to delete this rating?</Text>
+                <div className=" flex gap-x-2">
+                  <Button loading={deleteLoading} onClick={handleDelete}>
+                    Confirm
+                  </Button>
+                  <Button color="red" onClick={deleteClose}>
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            </Modal>
           </div>
         </>
       )}
